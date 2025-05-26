@@ -68,4 +68,60 @@ public class SistemaAPP {
             return opcao;
         }
 
+        private static void menuColaboradores() {
+            int opcao;
+
+            do {
+                System.out.println("\n--- Menu de Colaboradores ---");
+                System.out.println("1 - Adicionar Colaborador");
+                System.out.println("2 - Listar Colaboradores");
+                System.out.println("3 - Buscar Colaborador por ID");
+                System.out.println("4 - Atualizar Colaborador");
+                System.out.println("5 - Excluir Colaborador");
+                System.out.println("0 - Voltar ao Menu Principal");
+                System.out.print("Escolha: ");
+                opcao = lerOpcao();
+
+                switch (opcao) {
+                    case 1:
+                        adicionarColaborador();
+                        break;
+
+                    case 2:
+                        listarColaboradores();
+                        break;
+
+                    case 3:
+                        buscarColaboradorPorId();
+                        break;
+
+                    case 4:
+                        atualizarColaborador();
+                        break;
+
+                    case 5:
+                        deletarColaborador();
+                        break;
+
+                    case 0:
+                        System.out.println("Voltando ao Menu Principal");
+                        break;
+
+                    default:
+                        System.out.println("Opção inválida. Tente novamente.");
+                }
+            } while (opcao != 0);
+
+        }
+
+        private static void adicionarColaborador() {
+            System.out.println("\n--- Adicionar Colaborador ---");
+            System.out.print("Nome: ");
+            String nome = scanner.nextLine();
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
+
+            eTipoColaborador tipo = null;
+        }
+
 }
