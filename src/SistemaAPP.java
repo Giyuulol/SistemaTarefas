@@ -16,7 +16,7 @@ public class SistemaAPP {
     private static CategoriaDao categoriaDao = new CategoriaDao();
     private static TarefaDao tarefaDao = new TarefaDao();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         int opcao;
 
@@ -68,7 +68,7 @@ public class SistemaAPP {
             return opcao;
         }
 
-        private static void menuColaboradores() {
+        private static void menuColaboradores() throws Exception {
             int opcao;
 
             do {
@@ -114,7 +114,7 @@ public class SistemaAPP {
 
         }
 
-        private static void adicionarColaborador() {
+        private static void adicionarColaborador() throws Exception {
             System.out.println("\n--- Adicionar Colaborador ---");
             System.out.print("Nome: ");
             String nome = scanner.nextLine();
@@ -122,6 +122,113 @@ public class SistemaAPP {
             String email = scanner.nextLine();
 
             eTipoColaborador tipo = null;
+            while (tipo == null) {
+                System.out.print("Tipo [Colaborador | Gerente]: ");
+                String tipoStr = scanner.nextLine().toUpperCase();
+
+                try {
+                    tipo = eTipoColaborador.valueOf(tipoStr);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Tipo inválido. Digite 'Colaborador | Gerente'.");
+                }
+            }
+            cColaborador novoColaborador = new cColaborador(nome, email, tipo);
+            colaboradorDao.adicionar(novoColaborador);
+            System.out.println("Colaborador adicionado com sucesso.");
         }
+
+        private static void listarColaboradores() throws Exception {
+            System.out.println("\n--- Listar Colaboradores ---");
+            List<cColaborador> colaboradores = colaboradorDao.listar();
+            if (colaboradores.isEmpty()) {
+                System.out.println("Nenhum colaborador encontrado.");
+            } else {
+               colaboradores.forEach(System.out::println);
+            }
+        }
+
+        private static void buscarColaboradorPorId() throws Exception {
+            System.out.println("\n--- Buscar Colaborador com ID ---");
+            System.out.print("Digite o ID do colaborador: ");
+            int id = lerOpcao();
+
+            cColaborador colaborador = colaboradorDao.buscarPorId(id);
+            if (colaborador != null) {
+                System.out.println("Colaborador encontrado.");
+                System.out.println(colaborador.toString());
+            } else {
+                System.out.println("Nenhum colaborador encontrado.");
+            }
+        }
+
+        private static void atualizarColaborador() throws Exception {
+            System.out.println("\n--- Atualizar Colaborador com ID ---");
+            System.out.print("Digite o ID do colaborador a ser atualizado: ");
+            int id = lerOpcao();
+
+            cColaborador colaborador = colaboradorDao.buscarPorId(id);
+            if (colaborador == null) {
+                System.out.println("Nenhum colaborador encontrado.");
+
+            }
+            System.out.println("Colaborador atual: ");
+            System.out.println(colaborador.toString());
+
+            System.out.println("Novo nome (" + colaborador.getNome() + "): ");
+            String novoNome = scanner.nextLine();
+            if (!novoNome.isEmpty()) {
+                colaborador.setNome(novoNome);
+            }
+
+            System.out.println("Novo email (" + colaborador.getEmail() + "): ");
+            String novoEmail = scanner.nextLine();
+            if (!novoEmail.isEmpty()) {
+                colaborador.setEmail(novoEmail);
+            }
+
+            eTipoColaborador novoTipo = null;
+            String tipoAtual = colaborador.getTipo().name();
+            while (novoTipo == null) {
+                System.out.println("Novo tipo (" + tipoAtual + ") (Colaborador | Gerente): ) ");
+                String novoTipoStr = scanner.nextLine().toUpperCase();
+                if (novoTipoStr.isEmpty()) {
+                    novoTipo = eTipoColaborador.valueOf(tipoAtual);
+                } else {
+                    try {
+                        novoTipo = eTipoColaborador.valueOf(novoTipoStr);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Tipo inválido. Digite 'Colaborador | Gerente' ou deixe em " +
+                                "branco para manter o tipo atual" +
+                                ".");
+                    }
+                }
+            }
+            colaborador.setTipo(novoTipo);
+            colaboradorDao.atualizar(colaborador);
+            System.out.println("Colaborador atualizado com sucesso.");
+
+        }
+
+        private static void deletarColaborador() throws Exception {
+            System.out.println("\n--- Deletar Colaborador com ID ---");
+            System.out.print("Digite o ID do colaborador a ser deletado: ");
+            int id = lerOpcao();
+
+            cColaborador colaborador = colaboradorDao.buscarPorId(id);
+            if (colaborador != null) {
+                System.out.print("Tem certeza que deseja deletar o colaborador " + colaborador.getNome() +
+                        " (ID: " + id + ")? [S/N]: ");
+                String confirmacao = scanner.nextLine().toUpperCase();
+                if (confirmacao.equals("S")) {
+                    colaboradorDao.excluir(id);
+                    System.out.println("Colaborador deletado com sucesso.");
+                } else {
+                    System.out.println("Operação cancelada.");
+                }
+
+            } else {
+                System.out.println("Nenhum colaborador encontrado.");
+            }
+    }
 
 }
