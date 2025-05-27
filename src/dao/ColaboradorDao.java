@@ -3,6 +3,8 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.eTipoColaborador;
 import util.connectionFactory;
 import model.cColaborador;
 
@@ -10,10 +12,11 @@ public class ColaboradorDao {
 
     public void adicionar(cColaborador col) throws Exception {
         Connection conn = connectionFactory.getConnection();
-        String sql = "INSERT INTO colaboradores (nome, email) VALUES (?, ?)";
-        PreparedStatement stmt = conn.prepareStatement(sql);
+        String sql = "INSERT INTO colaboradores (nome, email, tipo) VALUES (?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         stmt.setString(1, col.getNome());
         stmt.setString(2, col.getEmail());
+        stmt.setString(3, col.getTipo().name());
         stmt.executeUpdate();
         stmt.close();
         conn.close();
@@ -27,7 +30,10 @@ public class ColaboradorDao {
 
         List<cColaborador> lista = new ArrayList<>();
         while (rs.next()) {
-            lista.add(new cColaborador(rs.getInt("id"), rs.getString("nome"), rs.getString("email")));
+            lista.add(new cColaborador( rs.getInt("id"),
+                                        rs.getString("nome"),
+                                        rs.getString("email"),
+                                        eTipoColaborador.valueOf(rs.getString("tipo"))));
         }
         rs.close();
         stmt.close();
@@ -42,12 +48,13 @@ public class ColaboradorDao {
         stmt.setInt(1, id);
         ResultSet rs = stmt.executeQuery();
 
-    cColaborador col = null;
+        cColaborador col = null;
         if (rs.next()) {
             col = new cColaborador(
                 rs.getInt("id"),
                 rs.getString("nome"),
-                rs.getString("email")
+                rs.getString("email"),
+                eTipoColaborador.valueOf(rs.getString("tipo"))
             );
         }
 
@@ -58,14 +65,16 @@ public class ColaboradorDao {
     }
     public void atualizar(cColaborador col) throws Exception {
         Connection conn = connectionFactory.getConnection();
-        String sql = "UPDATE colaboradores SET nome = ?, email = ?, telefone = ?, cpf = ?, cargo = ? WHERE id = ?";
+        String sql = "UPDATE colaboradores SET nome = ?, email = ?, tipo = ?  WHERE id = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, col.getNome());
         stmt.setString(2, col.getEmail());
-        stmt.setInt(6, col.getId());
+        stmt.setString(3, col.getTipo().name());
+        stmt.setInt(4, col.getId());
         stmt.executeUpdate();
         stmt.close();
         conn.close();
+
     }
 
     public void excluir(int id) throws Exception {
