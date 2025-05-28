@@ -352,8 +352,261 @@ public class SistemaAPP {
     }
 
 //     MENU TAREFAS
-    private static void menuTarefas() {
+    private static void menuTarefas() throws Exception {
+        int opcao;
 
+        do {
+            System.out.println("\n--- Menu Tarefas ---");
+            System.out.println("1 - Adicionar Tarefa");
+            System.out.println("2 - Listar Tarefa");
+            System.out.println("3 - Buscar Tarefa por ID");
+            System.out.println("4 - Atualizar Tarefa");
+            System.out.println("5 - Deletar Tarefa");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
+            opcao = lerOpcao();
+
+            switch (opcao) {
+                case 1:
+                    adicionarTarefa();
+                    break;
+
+                case 2:
+                    listarTarefas();
+                    break;
+
+                case 3:
+                    buscarTarefaPorId();
+                    break;
+
+                case 4:
+                    atualizarTarefa();
+                    break;
+
+                case 5:
+                    deletarTarefa();
+                    break;
+
+                case 0:
+                    System.out.println("Voltando ao Menu Principal");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+
+            }
+
+        } while (opcao != 0);
+    }
+
+    private static void adicionarTarefa () throws Exception {
+        System.out.println("\n--- Adicionar Tarefa ---");
+        System.out.print("Digite o nome do Tarefa: ");
+        String nome = scanner.nextLine();
+
+        System.out.println("Descrição (opcional): ");
+        String descricao = scanner.nextLine();
+        if(descricao.isEmpty()) {
+            descricao = null;
+        }
+
+        LocalDate dataVencimento = null;
+        boolean dataValida = false;
+
+        while(!dataValida) {
+            System.out.println("Data de vencimento (AAAA-MM-DD): )");
+            String dataString = scanner.nextLine();
+            if(dataString.isEmpty()) {
+                dataValida = true;
+            } else {
+                try {
+                    dataVencimento = LocalDate.parse(dataString);
+                    dataValida = true;
+                } catch (DateTimeParseException e) {
+                    System.out.println("Formato inválido. Por favor, use AAAA-MM-DD.");
+                }
+            }
+        }
+        eStatusTarefa status = null;
+        while(status == null) {
+            System.out.print("Status (PENDENTE, EM_ANDAMENTO, CONCLUIDA): ");
+            String statusString = scanner.nextLine();
+
+            try {
+                status = eStatusTarefa.valueOf(statusString);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Status inválido! Por favor, use PENDENTE, EM_ANDAMENTO ou CONCLUIDA.");
+            }
+        }
+
+        cColaborador colaborador = null;
+        System.out.print("Digite o ID do Colaborador Responsável (0 para nenhum): ");
+        int colaboradorId = lerOpcao();
+        if(colaboradorId != 0) {
+            colaborador = colaboradorDao.buscarPorId(colaboradorId);
+
+            if (colaborador == null) {
+                System.out.println("Colaborador com ID " + colaboradorId + " não encontrado.");
+            }
+        }
+
+        cCategoria categoria = null;
+        System.out.print("ID da categoria (0 para nenhuma): ");
+        int categoriaId = lerOpcao();
+
+        if(categoriaId != 0) {
+            categoria = categoriaDao.buscarCategoria(categoriaId);
+            if (categoria == null) {
+                System.out.println("Categoria com ID " + categoriaId + " não encontrada.");
+            }
+        }
+
+        cTarefa novaTarefa = new cTarefa(nome, descricao, dataVencimento, status, colaborador, categoria);
+        tarefaDao.adicionarTarefa(novaTarefa);
+        System.out.println("Tarefa adicionada com sucesso!");
+    }
+
+    private static void listarTarefas () throws Exception {
+        System.out.println("\n--- Listar Tarefas ---");
+        List<cTarefa> tarefas = tarefaDao.listarTarefas();
+        if(tarefas.isEmpty()) {
+            System.out.println("Nenhuma tarefa cadastrada.");
+        } else {
+            tarefas.forEach(System.out::println);
+        }
+    }
+
+    private static void buscarTarefaPorId () throws Exception {
+        System.out.println("\n--- Buscar Tarefa por ID ---");
+        System.out.print("Digite o ID da tarefa para busca: ");
+        int id = lerOpcao();
+
+        cTarefa tarefa = tarefaDao.buscarTarefaPorId(id);
+        if(tarefa != null) {
+            System.out.println("Tarefa encontrada com sucesso! " + tarefa);
+        } else {
+            System.out.println("Nenhuma tarefa cadastrada.");
+        }
+    }
+
+    private static void atualizarTarefa () throws Exception {
+        System.out.println("\n--- Atualizar Tarefa ---");
+        System.out.print("Digite o ID da tarefa a ser atualizada: ");
+        int id = lerOpcao();
+
+        cTarefa tarefa = tarefaDao.buscarTarefaPorId(id);
+
+        if(tarefa == null) {
+            System.out.println("Nenhuma tarefa encontrada.");
+            return;
+        }
+        System.out.println("Tarefa atual: " + tarefa);
+
+        System.out.println("Novo titulo (" + tarefa.getTitulo() + "): " );
+        String novoTitulo = scanner.nextLine();
+
+        if(!novoTitulo.isEmpty()) {
+            tarefa.setTitulo(novoTitulo);
+        }
+        System.out.print("Nova Descrição (" + (tarefa.getDescricao() != null ? tarefa.getDescricao() : "N/A") + ") (opcional): ");
+        String novaDescricao = scanner.nextLine();
+        if(!novaDescricao.isEmpty()) {
+            tarefa.setDescricao(novaDescricao);
+        } else if (tarefa.getDescricao() != null) {
+
+        } else {
+            tarefa.setDescricao(null);
+        }
+
+        LocalDate novaDataVencimento = null;
+
+        boolean dataValida = false;
+        while(!dataValida) {
+            System.out.print("Nova data de Vencimento ( " + tarefa.getDataVencimento() + "): ");
+            String novaDataString = scanner.nextLine();
+            if (novaDataString.isEmpty()) {
+                novaDataVencimento = tarefa.getDataVencimento();
+                dataValida = true;
+            } else {
+                try {
+                    novaDataVencimento = LocalDate.parse(novaDataString);
+                    dataValida = true;
+                } catch (DateTimeParseException e) {
+                    System.out.println("Formato inválido. Por favor, use AAAA-MM-DD.");
+                }
+            }
+        }
+        tarefa.setDataVencimento(novaDataVencimento);
+
+        eStatusTarefa novoStatus = null;
+        String statusAtual = tarefa.getStatus().name();
+        while(novoStatus == null) {
+            System.out.print("Novo Status (" + statusAtual + ") (PENDENTE, EM_ANDAMENTO, CONCLUIDA): ");
+            String novoStatusString = scanner.nextLine();
+            if (novoStatusString.isEmpty()) {
+                novoStatus = eStatusTarefa.valueOf(statusAtual);
+            } else {
+                try {
+                    novoStatus = eStatusTarefa.valueOf(novoStatusString);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Status inválido. Por favor, digite PENDENTE, EM_ANDAMENTO, CONCLUIDA ou deixe em branco para manter o atual.");
+                }
+            }
+            tarefa.setStatus(novoStatus);
+
+
+            System.out.print("Novo ID do Colaborador Responsável (" + (tarefa.getColaborador() != null ? tarefa.getColaborador().getId() : "N/A") + ") (0 para nenhum, ou novo ID): ");
+            int novoColaboradorId = lerOpcao();
+            if (novoColaboradorId != 0) {
+                cColaborador novoColaborador = colaboradorDao.buscarPorId(novoColaboradorId);
+                if (novoColaborador != null) {
+                    tarefa.setColaborador(novoColaborador);
+                } else {
+                    System.out.println("Colaborador com ID " + novoColaboradorId + " não encontrado. Colaborador não alterado.");
+                }
+            } else {
+                tarefa.setColaborador(null); // Desassociar colaborador
+            }
+
+
+            System.out.print("Novo ID da Categoria (" + (tarefa.getCategoria() != null ? tarefa.getCategoria().getId() : "N/A") + ") (0 para nenhuma, ou novo ID): ");
+            int novaCategoriaId = lerOpcao();
+            if (novaCategoriaId != 0) {
+                cCategoria novaCategoria = categoriaDao.buscarCategoria(novaCategoriaId);
+                if (novaCategoria != null) {
+                    tarefa.setCategoria(novaCategoria);
+                } else {
+                    System.out.println("Categoria com ID " + novaCategoriaId + " não encontrada. Categoria não alterada.");
+                }
+            } else {
+                tarefa.setCategoria(null); // Desassociar categoria
+            }
+
+            tarefaDao.atualizarTarefa(tarefa);
+            System.out.println("Tarefa atualizada com sucesso! " + tarefaDao.buscarTarefaPorId(id));
+
+        }
+
+    }
+
+    private static void deletarTarefa() throws Exception {
+        System.out.println("\n--- Deletar Tarefa ---");
+        System.out.print("Digite o ID da tarefa a ser deletada: ");
+        int id = lerOpcao();
+
+        cTarefa tarefa = tarefaDao.buscarTarefaPorId(id);
+        if (tarefa != null) {
+            System.out.print("Tem certeza que deseja deletar a tarefa \"" + tarefa.getTitulo() + "\" (ID: " + id + ")? (S/N): ");
+            String confirmacao = scanner.nextLine().toUpperCase();
+            if (confirmacao.equals("S")) {
+                tarefaDao.deletarTarefa(id);
+                System.out.println("Tarefa deletada com sucesso!");
+            } else {
+                System.out.println("Operação cancelada.");
+            }
+        } else {
+            System.out.println("Tarefa com ID " + id + " não encontrada.");
+        }
     }
 
 }

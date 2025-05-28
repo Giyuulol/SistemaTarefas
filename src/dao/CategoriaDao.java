@@ -25,7 +25,7 @@ public class CategoriaDao {
     }
 
     public List<cCategoria> listarCategoria() throws Exception {
-        String sql = "SELECT FROM categorias";
+        String sql = "SELECT * FROM categorias";
         List<cCategoria> lista = new ArrayList<>();
         try (Connection conn = connectionFactory.getConnection();
              Statement stmt = conn.createStatement();
