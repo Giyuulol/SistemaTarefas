@@ -231,4 +231,129 @@ public class SistemaAPP {
             }
     }
 
+//    MENU CATEGORIA
+    private static void  menuCategorias () throws Exception {
+        int opcao;
+
+        do {
+            System.out.println("\n--- Menu de Categorias ---");
+            System.out.println("1 - Adicionar Categoria");
+            System.out.println("2 - Listar Categorias");
+            System.out.println("3 - Buscar Categoria por ID");
+            System.out.println("4 - Atualizar Categoria");
+            System.out.println("5 - Deletar Categoria");
+            System.out.println("0 - Voltar ao Menu Principal");
+            opcao = lerOpcao();
+
+            switch (opcao) {
+                case 1:
+                    adicionarCategoria();
+                    break;
+
+                case 2:
+                    listarCategorias();
+                    break;
+
+                case 3:
+                    buscarCategoriaPorId();
+                    break;
+
+                case 4:
+                    atualizarCategoria();
+                    break;
+
+                case 5:
+                    deletarCategoria();
+                    break;
+
+                case 0:
+                    System.out.println("Voltando ao Menu Principal");
+                    break;
+
+                default:
+                    System.out.println("Opçãon inválida! Tente novamente.");
+
+            }
+        } while (opcao != 0);
+    }
+
+
+    private static void adicionarCategoria () throws Exception {
+        System.out.println("\n--- Adicionar Categoria ---");
+        System.out.print("Digite o nome do Categoria: ");
+        String nome = scanner.nextLine();
+        cCategoria novaCategoria = new cCategoria(nome);
+        categoriaDao.adicionarCategoria(novaCategoria);
+        System.out.println("Categoria " + novaCategoria.toString().toUpperCase() + " adicionado com sucesso!");
+    }
+
+    private static void listarCategorias () throws Exception {
+        System.out.println("\n--- Listar Categorias ---");
+        List<cCategoria> categorias = categoriaDao.listarCategoria();
+        if (categorias.isEmpty()) {
+            System.out.println("Nenhum categoria encontrado.");
+        } else {
+            categorias.forEach(System.out::println);
+        }
+    }
+
+    private static void buscarCategoriaPorId () throws Exception {
+        System.out.println("\n--- Buscar Categoria com ID ---");
+        System.out.println("Digite o ID do Categoria: ");
+        int id = lerOpcao();
+
+        cCategoria categoria = categoriaDao.buscarCategoria(id);
+        if (categoria != null) {
+            System.out.println("Categoria encontrada:\n" + categoria.toString());
+        } else {
+            System.out.println("Categoria com ID " + id + " não encontrada.");
+        }
+    }
+
+    private static void atualizarCategoria () throws Exception {
+        System.out.println("\n--- Atualizar Categoria ---");
+        System.out.print("Digite o ID do Categoria: ");
+        int id = lerOpcao();
+
+        cCategoria categoria = categoriaDao.buscarCategoria(id);
+        if (categoria == null) {
+            System.out.println("Nenhum categoria encontrado.");
+            return;
+        }
+        System.out.println("Categoria atual:\n" + categoria.toString());
+        System.out.println("Novo nome (" + categoria.getNome() + "): ");
+        String novoNome = scanner.nextLine();
+
+        if (!novoNome.isEmpty()) {
+            categoria.setNome(novoNome);
+        }
+        categoriaDao.atualizarCategoria(categoria);
+        System.out.println("Categoria atualizada com sucesso.");
+    }
+
+    private static void deletarCategoria () throws Exception {
+            System.out.println("\n--- Deletar Categoria ---");
+            System.out.print("Digite o ID do Categoria: ");
+            int id = lerOpcao();
+
+            cCategoria categoria = categoriaDao.buscarCategoria(id);
+            if (categoria != null) {
+                System.out.println("Deletar a categoria " + categoria.getNome() + "?\n[S/N]: ");
+                String confirmacao = scanner.nextLine().toUpperCase();
+                if (confirmacao.equals("S")) {
+                    categoriaDao.removerCategoria(id);
+                    System.out.println("Categoria removida com sucesso.");
+                } else {
+                    System.out.println("Operação cancelada.");
+                }
+            } else {
+                System.out.println("Nenhum categoria encontrado.");
+            }
+    }
+
+//     MENU TAREFAS
+    private static void menuTarefas() {
+
+    }
+
 }
