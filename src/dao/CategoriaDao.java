@@ -1,6 +1,6 @@
 package dao;
 
-import java.sql.;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +9,7 @@ import util.connectionFactory;
 
 public class CategoriaDao {
 
-    public void adicionar(cCategoria cat) throws Exception {
+    public void adicionarCategoria(cCategoria cat) throws Exception {
         String sql = "INSERT INTO categorias (nome) VALUES (?)";
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -24,7 +24,7 @@ public class CategoriaDao {
         }
     }
 
-    public List<cCategoria> listar() throws Exception {
+    public List<cCategoria> listarCategoria() throws Exception {
         String sql = "SELECT FROM categorias";
         List<cCategoria> lista = new ArrayList<>();
         try (Connection conn = connectionFactory.getConnection();
@@ -42,7 +42,7 @@ public class CategoriaDao {
         return lista;
     }
 
-    public cCategoria buscar(int id) throws Exception {
+    public cCategoria buscarCategoria(int id) throws Exception {
         String sql = "SELECT * FROM categorias WHERE id = ?";
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -62,7 +62,7 @@ public class CategoriaDao {
         return null;
     }
 
-    public void atualizar(cCategoria cat) throws Exception {
+    public void atualizarCategoria(cCategoria cat) throws Exception {
         String sql = "UPDATE categorias SET nome = ? WHERE id = ?";
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -73,7 +73,7 @@ public class CategoriaDao {
         }
     }
 
-    public void remover(int id) throws Exception {
+    public void removerCategoria(int id) throws Exception {
         String sql = "DELETE FROM categorias WHERE id = ?";
         try (Connection conn = connectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
