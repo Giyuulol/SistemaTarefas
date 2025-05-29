@@ -1,7 +1,13 @@
 # Sistema para Controle de Tarefas
 
 ## 📝 Descrição do Projeto
-Este é um sistema em Java para gerenciar tarefas de equipes de desenvolvimento de software. O objetivo é facilitar a organização e o acompanhamento das atividades do projeto. Desenvolvido como projeto final da disciplina de Programação Orientada a Objetos. [cite: 1, 8]
+Este é um sistema em Java para gerenciar tarefas de equipes de desenvolvimento de software. O objetivo é facilitar a organização e o acompanhamento das atividades do projeto. Desenvolvido como projeto final da disciplina de Programação Orientada a Objetos.
+
+## 👨‍💻 Autores
+* Alex Dantas de Oliveira e Silva
+* Diego Braga Fong
+* Francisco Serafim da Silva
+* Handrey Kaleu Matias Souza de Carvalho
 
 ## ✨ Funcionalidades Implementadas
 
